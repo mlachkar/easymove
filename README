@@ -1,0 +1,13 @@
+Dépendances
+===========
+
+* opencv
+* cvblob
+* Qt
+
+Compilation
+===========
+
+$ qmake
+$ make
+$ ./easymove
