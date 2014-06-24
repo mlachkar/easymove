@@ -1,7 +1,7 @@
 #include "patchDetection.h"
 
 patchDetection::patchDetection()
-: _redLimit(0.2), _blueLimit(0.2)
+: _redLimit(0.2), _blueLimit(0.2), _minBlobArea(500), _maxBlobArea(1000000)
 {
     this->_capture = cvCaptureFromCAM(0);
     this->grabFrame();
@@ -13,15 +13,27 @@ patchDetection::patchDetection()
 float patchDetection::getRedLimit() const {
   return this->_redLimit;
 }
+
 float patchDetection::getBlueLimit() const {
   return this->_blueLimit;
 }
+
+unsigned int patchDetection::getMinBlobArea() const {
+  return this->_minBlobArea;
+}
+
+unsigned int patchDetection::getMaxBlobArea() const {
+  return this->_maxBlobArea;
+}
+
 int patchDetection::getWidth() const {
   return this->_imgSize.width;
 }
+
 int patchDetection::getHeight() const {
   return this->_imgSize.height;
 }
+
 std::vector<Patch> patchDetection::getDetectedPatches() {
   return this->_detectedPatches;
 }
@@ -31,6 +43,12 @@ void patchDetection::setRedLimit(float redLimit) {
 }
 void patchDetection::setBlueLimit(float blueLimit) {
   this->_blueLimit = blueLimit;
+}
+void patchDetection::setMinBlobArea(unsigned int minBlobArea) {
+  this->_minBlobArea = minBlobArea;
+}
+void patchDetection::setMaxBlobArea(unsigned int maxBlobArea) {
+  this->_maxBlobArea = maxBlobArea;
 }
 
 IplImage* patchDetection::getFrame(bool displayBlobs) {
@@ -67,8 +85,8 @@ IplImage* patchDetection::getFrame(bool displayBlobs) {
     cvLabel(segmentatedRed, labelImg, redBlobs);
     cvLabel(segmentatedBlue, labelImg, blueBlobs);
 
-    cvFilterByArea(redBlobs, 500, 1000000);
-    cvFilterByArea(blueBlobs, 500, 1000000);
+    cvFilterByArea(redBlobs, this->_minBlobArea, this->_maxBlobArea);
+    cvFilterByArea(blueBlobs, this->_minBlobArea, this->_maxBlobArea);
     
     if (displayBlobs) {
       cvRenderBlobs(labelImg, redBlobs, this->_frame, this->_frame, CV_BLOB_RENDER_BOUNDING_BOX);
