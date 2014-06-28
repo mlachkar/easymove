@@ -5,7 +5,8 @@ QT += core gui widgets
 SOURCES += main.cpp \
     cvWindow.cpp \
     patch.cpp \
-    patchDetection.cpp
+    patchDetection.cpp \
+    speaker.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -13,7 +14,8 @@ include(deployment.pri)
 HEADERS += \
     cvWindow.h \
     patch.h \
-    patchDetection.h
+    patchDetection.h \
+    speaker.h
 
 ## OpenCV settings for Unix/Linux
 unix:!mac {
@@ -23,7 +25,11 @@ unix:!mac {
         -lopencv_core \
         -lopencv_highgui \
         -lopencv_imgproc \
-        -lcvblob
+        -lcvblob \
+        -lFestival \
+        -lestools \
+        -lestbase \
+        -leststring
 }
 
 OTHER_FILES +=

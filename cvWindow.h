@@ -5,7 +5,7 @@
 #include <QImage>
 #include <QKeyEvent>
 
-#include "patchDetection.h"
+#include <patchDetection.h>
 
 class cvWindow : public QWidget
 {

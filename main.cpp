@@ -1,4 +1,4 @@
-#include "cvWindow.h"
+#include <cvWindow.h>
 
 #include <QApplication>
 

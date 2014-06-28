@@ -11,7 +11,7 @@ class patchDetection
 {
 public:
     patchDetection();
-    //~patchDetection();
+    ~patchDetection();
     
     float getRedLimit() const;
     float getBlueLimit() const;

@@ -1,4 +1,4 @@
-#include "patchDetection.h"
+#include <patchDetection.h>
 
 patchDetection::patchDetection()
 : _redLimit(0.2), _blueLimit(0.2), _minBlobArea(500), _maxBlobArea(1000000)
@@ -10,6 +10,9 @@ patchDetection::patchDetection()
     IplImage* img = cvRetrieveFrame(_capture);
     _imgSize = cvGetSize(img);
     _frame = cvCreateImage(_imgSize, img->depth, img->nChannels);
+}
+
+patchDetection::~patchDetection() {
 }
 
 float patchDetection::getRedLimit() const {
@@ -119,4 +122,3 @@ void patchDetection::detectPatches(bool displayBlobs) {
     cvReleaseBlobs(redBlobs);
     cvReleaseBlobs(blueBlobs);
 }
-

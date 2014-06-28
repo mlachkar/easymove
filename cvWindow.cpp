@@ -1,4 +1,4 @@
-#include "cvWindow.h"
+#include <cvWindow.h>
 
 #include <QPainter>
 #include <QTimer>
@@ -28,6 +28,9 @@ cvWindow::~cvWindow()
 
     if (_image)
         delete _image;
+
+    if (_patchDetection)
+        delete _patchDetection;
 }
 
 void cvWindow::_tick()
