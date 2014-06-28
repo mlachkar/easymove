@@ -73,7 +73,7 @@ void cvWindow::paintEvent(QPaintEvent* e)
     {
        for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
         {
-            video_painter.setPen(QPen(QColor("#2e8b57")));
+            video_painter.setPen(QPen(QColor("#ff0080")));
             QPoint r1(0,(*first).getRadius());
             QPoint r2(0,(*second).getRadius());
             QPoint p1 = (QPoint)*first += r1;
