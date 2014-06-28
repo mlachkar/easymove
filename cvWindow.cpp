@@ -1,7 +1,6 @@
 #include "cvWindow.h"
 
 #include <QPainter>
-#include <QFileDialog>
 #include <QTimer>
 #include <QApplication>
 
@@ -62,15 +61,8 @@ void cvWindow::paintEvent(QPaintEvent* e)
     video_painter.setRenderHints(QPainter::Antialiasing);
 
     std::vector<Patch> p = this->_patchDetection->getDetectedPatches();
-    std::vector<Patch>::const_iterator itr;
-    for(itr = p.begin(); itr != p.end(); ++itr){
-        _draw_patch(video_painter, (*itr));
-    }
 
     std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
-    for(itr = p.begin(); itr != p.end(); ++itr){
-        _draw_patch(video_painter, (*itr));
-    }
 
     //Draw lines between patches
     std::sort(p.begin(), p.end(), Patch::compareByX);
@@ -88,6 +80,12 @@ void cvWindow::paintEvent(QPaintEvent* e)
             video_painter.drawLine(p1, p2 );
             video_painter.drawLine(p3, p4 );
        }
+    }
+
+    video_painter.setPen(QPen(Qt::black));
+    std::vector<Patch>::const_iterator itr;
+    for(itr = p.begin(); itr != p.end(); ++itr){
+        _draw_patch(video_painter, (*itr));
     }
 
     // Draw a frame from the video

@@ -4,6 +4,8 @@ patchDetection::patchDetection()
 : _redLimit(0.2), _blueLimit(0.2), _minBlobArea(500), _maxBlobArea(1000000)
 {
     _capture = cvCaptureFromCAM(0);
+    cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_HEIGHT, 720);
+    cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_WIDTH, 1280);
     cvGrabFrame(_capture);
     IplImage* img = cvRetrieveFrame(_capture);
     _imgSize = cvGetSize(img);
