@@ -1,5 +1,5 @@
 #pragma once
-#include <QMainWindow>
+#include <QWidget>
 #include <QMenu>
 #include <QMenuBar>
 #include <QImage>
@@ -7,7 +7,7 @@
 
 #include "patchDetection.h"
 
-class cvWindow : public QMainWindow
+class cvWindow : public QWidget
 {
     Q_OBJECT
 
@@ -15,10 +15,8 @@ public:
     cvWindow();
     ~cvWindow();
 
-    void _draw_video_frame(QPainter& painter, bool grayed);
-    void _draw_info_text(QPainter& painter);
+    void _draw_video_frame(QPainter& painter);
     void _draw_patch(QPainter& painter, Patch p);
-
 
     void paintEvent(QPaintEvent* e);
     void keyPressEvent(QKeyEvent* event);
@@ -27,12 +25,8 @@ public:
     void setAverageFrequency(unsigned char);
 
 private:
-    QMenuBar _menu_bar;
-    QMenu* _menu;
     QImage* _image;
-    int _tick_ms;
     Qt::AspectRatioMode _ar_mode;
-    int _fps;
     int _video_width;
     int _video_height;
     QTimer* _timer;
@@ -46,9 +40,9 @@ private:
     bool _grayed;
 
 private slots:
-    //void _open();
     void _tick();
     void _start();
+    void _pause();
 
 protected:
     void _close();
