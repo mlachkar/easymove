@@ -126,22 +126,36 @@ void cvWindow::paintEvent(QPaintEvent* e)
     //_draw_info_text(painter);
     
     std::vector<Patch> p = this->_patchDetection->getDetectedPatches();
-
     std::vector<Patch>::const_iterator itr;
-    for(itr = p.begin(); itr != p.end(); ++itr){        
+    for(itr = p.begin(); itr != p.end(); ++itr){
         _draw_patch(painter, (*itr));
     }
-    std::vector<Patch>::const_iterator itr2;
+
+    std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
+    for(itr = p.begin(); itr != p.end(); ++itr){
+        _draw_patch(painter, (*itr));
+    }
+
+    //Draw lines between patches
     std::sort(p.begin(), p.end(), Patch::compareByX);
-//    Patch prev = *p.begin();
-//    for(itr2 = p.begin(); itr2 != p.end(); ++itr2){
-//        _draw_line(painter, prev, (*itr2));
-//        prev = (*itr2);
-//    }
+    if( second != end )
+    {
+       for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
+        {
+            painter.setPen(QPen(QColor("#2e8b57")));
+            QPoint r1(0,(*first).getRadius());
+            QPoint r2(0,(*second).getRadius());
+            QPoint p1 = (QPoint)*first += r1;
+            QPoint p2 = (QPoint)*second += r2;
+            QPoint p3 = (QPoint)*first -= r1;
+            QPoint p4 = (QPoint)*second -= r2;
+            painter.drawLine(p1, p2 );
+            painter.drawLine(p3, p4 );
+       }
+    }
 
     QWidget::paintEvent(e);
 }
-
 void cvWindow::_draw_video_frame(QPainter& painter, bool grayed)
 {
     if (grayed) {
@@ -193,10 +207,6 @@ void cvWindow::_draw_patch(QPainter& painter, Patch p)
     painter.drawEllipse( p, p.getRadius(), p.getRadius());
 }
 
-void cvWindow::_draw_line(QPainter& painter, Patch p1, Patch p2 )
-{
-    painter.drawLine(p1, p2);
-}
 void cvWindow::_draw_info_text(QPainter& painter)
 {
     // Setup font properties

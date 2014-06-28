@@ -25,3 +25,5 @@ unix:!mac {
         -lopencv_imgproc \
         -lcvblob
 }
+
+OTHER_FILES +=
