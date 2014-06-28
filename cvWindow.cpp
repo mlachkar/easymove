@@ -51,11 +51,11 @@ void cvWindow::_tick()
     cv::Mat frame(this->_patchDetection->getFrame(false));
 /*
     if (p.size() > 100) {
-        std::sort(p.begin(), p.end(), Patch::compareByX);
+        std::sort(p.begin(), p.end(), Patch::yX);
         
         bool horizontal = p[2].getY() - p[0].getY() < 40;    
 
-        std::sort(p.begin(), p.end(), Patch::compareByY);
+        std::sort(p.begin(), p.end(), Patch::yY);
           
         // Produit scalaire des deux vecteurs entre les 3 points
         unsigned int alignedScoreRaw = abs((p[0].getX() - p[1].getY()) * (p[1].getY() - p[2].getY()) - (p[0].getY() - p[1].getY()) * (p[1].getX() - p[2].getX()));
@@ -131,6 +131,13 @@ void cvWindow::paintEvent(QPaintEvent* e)
     for(itr = p.begin(); itr != p.end(); ++itr){        
         _draw_patch(painter, (*itr));
     }
+    std::vector<Patch>::const_iterator itr2;
+    std::sort(p.begin(), p.end(), Patch::compareByX);
+//    Patch prev = *p.begin();
+//    for(itr2 = p.begin(); itr2 != p.end(); ++itr2){
+//        _draw_line(painter, prev, (*itr2));
+//        prev = (*itr2);
+//    }
 
     QWidget::paintEvent(e);
 }
@@ -183,9 +190,13 @@ void cvWindow::_draw_patch(QPainter& painter, Patch p)
     } else {
         painter.setBrush(QBrush(QColor(255, 128, 128, 128)));
     }
-    painter.drawEllipse( QPointF(p.getX(), p.getY()), p.getRadius(), p.getRadius());
+    painter.drawEllipse( p, p.getRadius(), p.getRadius());
 }
 
+void cvWindow::_draw_line(QPainter& painter, Patch p1, Patch p2 )
+{
+    painter.drawLine(p1, p2);
+}
 void cvWindow::_draw_info_text(QPainter& painter)
 {
     // Setup font properties

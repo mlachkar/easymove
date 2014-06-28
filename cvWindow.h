@@ -18,6 +18,7 @@ public:
     void _draw_video_frame(QPainter& painter, bool grayed);
     void _draw_info_text(QPainter& painter);
     void _draw_patch(QPainter& painter, Patch p);
+    void _draw_line(QPainter& painter, Patch p1, Patch p2);
 
     void paintEvent(QPaintEvent* e);
     void keyPressEvent(QKeyEvent* event);
