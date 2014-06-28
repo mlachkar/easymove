@@ -4,6 +4,7 @@ Dépendances
 * opencv
 * cvblob
 * Qt
+* festival (packages festival and festival-english)
 
 Compilation
 ===========
