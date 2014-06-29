@@ -2,7 +2,8 @@
 #include <highgui.h>
 #include <cv.h>
 #include <cvblob.h>
-#include "patch.h"
+#include <QImage>
+#include <patch.h>
 
 using namespace cvb;
 
@@ -10,7 +11,7 @@ class patchDetection
 {
 public:
     patchDetection();
-    //~patchDetection();
+    ~patchDetection();
     
     float getRedLimit() const;
     float getBlueLimit() const;
@@ -27,8 +28,10 @@ public:
     void setMinBlobArea(unsigned int);
     void setMaxBlobArea(unsigned int);
 
-    IplImage* getFrame(bool displayBlobs);
+    IplImage* getFrame();
     std::vector<Patch> getDetectedPatches();
+
+    void detectPatches(bool displayBlobs);
 
 private:
     float _redLimit;

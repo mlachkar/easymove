@@ -1,4 +1,4 @@
-#include "patch.h"
+#include <patch.h>
 
 Patch::Patch(int xcenter, int ycenter, int xmin, int ymin, int xmax, int ymax, unsigned char color) 
 :QPoint(xcenter, ycenter), _color(color)
