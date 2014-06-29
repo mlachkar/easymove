@@ -20,8 +20,3 @@ bool Patch::compareByX (const Patch p1, const Patch p2) {
 bool Patch::compareByY (const Patch p1, const Patch p2) {
   return p1.y() < p2.y();
 }
-//Patch & Patch::operator+=(const QPoint & point){
-//    Qpoint p = (this->x(),this->y());
-//    return(p += point);
-
-//}

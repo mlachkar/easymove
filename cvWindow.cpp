@@ -151,6 +151,7 @@ void cvWindow::paintEvent(QPaintEvent* e)
             QPoint p4 = (QPoint)*second -= r2;
             painter.drawLine(p1, p2 );
             painter.drawLine(p3, p4 );
+            painter.drawLine(*first, *second);
        }
     }
 
