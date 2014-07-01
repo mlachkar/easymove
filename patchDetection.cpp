@@ -7,6 +7,7 @@ patchDetection::patchDetection()
     cvGrabFrame(_capture);
     IplImage* img = cvRetrieveFrame(_capture);
     _imgSize = cvGetSize(img);
+
     _frame = cvCreateImage(_imgSize, img->depth, img->nChannels);
 }
 
@@ -54,6 +55,12 @@ void patchDetection::setMaxBlobArea(unsigned int maxBlobArea) {
 IplImage* patchDetection::getFrame() {
     return _frame;
 }
+
+
+CvCapture* patchDetection::getCapture() {
+    return _capture;
+}
+
 
 void patchDetection::detectPatches(bool displayBlobs) {
     cvGrabFrame(_capture);
