@@ -9,7 +9,6 @@
 class Patch : public QPoint
 {
 public:
-  Patch();
   Patch(int xcenter, int ycenter, int xmin, int ymin, int xmax, int ymax, unsigned char color);
   
   unsigned int getRadius() const;
@@ -17,7 +16,6 @@ public:
   
   static bool compareByX (const Patch p1, const Patch p2);
   static bool compareByY (const Patch p1, const Patch p2);
-//  Patch & Patch::operator+=(const QPoint & point);
 
 private:
   QPoint _center;

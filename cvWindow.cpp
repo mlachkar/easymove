@@ -1,7 +1,6 @@
-#include "cvWindow.h"
+#include <cvWindow.h>
 
 #include <QPainter>
-#include <QFileDialog>
 #include <QTimer>
 #include <QApplication>
 
@@ -30,6 +29,9 @@ cvWindow::~cvWindow()
 
     if (_image)
         delete _image;
+
+    if (_patchDetection)
+        delete _patchDetection;
 }
 
 void cvWindow::_tick()
@@ -63,15 +65,8 @@ void cvWindow::paintEvent(QPaintEvent* e)
     video_painter.setRenderHints(QPainter::Antialiasing);
 
     std::vector<Patch> p = this->_patchDetection->getDetectedPatches();
-    std::vector<Patch>::const_iterator itr;
-    for(itr = p.begin(); itr != p.end(); ++itr){
-        _draw_patch(video_painter, (*itr));
-    }
 
     std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
-    for(itr = p.begin(); itr != p.end(); ++itr){
-        _draw_patch(video_painter, (*itr));
-    }
 
     //Draw lines between patches
     std::sort(p.begin(), p.end(), Patch::compareByX);
@@ -79,16 +74,22 @@ void cvWindow::paintEvent(QPaintEvent* e)
     {
        for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
         {
-            video_painter.setPen(QPen(QColor("#2e8b57")));
+            video_painter.setPen(QPen(QColor("#ff0080")));
             QPoint r1(0,(*first).getRadius());
             QPoint r2(0,(*second).getRadius());
             QPoint p1 = (QPoint)*first += r1;
             QPoint p2 = (QPoint)*second += r2;
             QPoint p3 = (QPoint)*first -= r1;
             QPoint p4 = (QPoint)*second -= r2;
-            video_painter.drawLine(p1, p2 );
-            video_painter.drawLine(p3, p4 );
+            video_painter.drawLine(p1, p2);
+            video_painter.drawLine(p3, p4);
        }
+    }
+
+    video_painter.setPen(QPen(Qt::black));
+    std::vector<Patch>::const_iterator itr;
+    for(itr = p.begin(); itr != p.end(); ++itr){
+        _draw_patch(video_painter, (*itr));
     }
 
     // Draw a frame from the video
