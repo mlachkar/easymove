@@ -16,6 +16,7 @@ cvWindow::cvWindow()
     this->_alignementValues = new char[this->_averageFrequency];
 
     _patchDetection = new patchDetection();
+
 }
 
 cvWindow::~cvWindow()
@@ -82,6 +83,7 @@ void cvWindow::paintEvent(QPaintEvent* e)
             QPoint p4 = (QPoint)*second -= r2;
             video_painter.drawLine(p1, p2);
             video_painter.drawLine(p3, p4);
+            video_painter.drawLine(*first, *second);
        }
     }
 
@@ -89,7 +91,9 @@ void cvWindow::paintEvent(QPaintEvent* e)
     std::vector<Patch>::const_iterator itr;
     for(itr = p.begin(); itr != p.end(); ++itr){
         _draw_patch(video_painter, (*itr));
+        _algo();
     }
+
 
     // Draw a frame from the video
     _draw_video_frame(painter);
@@ -208,3 +212,42 @@ unsigned char cvWindow::_getAlignmentAverage() {
   }
   return sum/this->_averageFrequency;
 }
+void cvWindow::_algo()
+{
+    std::vector<Patch> p = this->_patchDetection->getDetectedPatches();
+    std::sort(p.begin(), p.end(), Patch::compareByX);
+    std::vector<Patch> pBlue;
+    std::vector<Patch> pRed;
+    speaker *_speaker = new speaker();
+
+    std::vector<Patch>::const_iterator itr;
+    for(itr = p.begin(); itr != p.end(); ++itr)
+    {
+        if((*itr).getColor() == BLUE)
+        {
+            pBlue.push_back(*itr);
+        }
+        else
+        {   pRed.push_back(*itr);
+//            std::cout << "pRed.size()" << pRed.size();
+//            std::cout <<""<< std::endl;
+        }
+    }
+
+    QPoint ref(100,100);
+
+    if(pRed.size()==1 && pBlue.size() == 0) // test avec un seul patch
+    {
+        if(p[0].getColor() == RED)
+        {
+            if (p[0].y() >= ref.y()){
+
+                _speaker->say("ok"); // Il faudrait faire une moyenne, sinon le speaker n'a pas le temps de parler pendant une frame
+            }
+            std::cout << "Que la correction commence !" << std::endl;
+
+        }
+
+    }
+}
+

@@ -6,6 +6,7 @@
 #include <QKeyEvent>
 
 #include <patchDetection.h>
+#include <speaker.h>
 
 class cvWindow : public QWidget
 {
@@ -24,6 +25,7 @@ public:
     unsigned char getAverageFrequency() const;
     void setAverageFrequency(unsigned char);
 
+    void _algo();
 private:
     QImage* _image;
     Qt::AspectRatioMode _ar_mode;
