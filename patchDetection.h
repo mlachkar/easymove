@@ -29,6 +29,7 @@ public:
     void setMaxBlobArea(unsigned int);
 
     IplImage* getFrame();
+    CvCapture* getCapture();
     std::vector<Patch> getDetectedPatches();
 
     void detectPatches(bool displayBlobs);

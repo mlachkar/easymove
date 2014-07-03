@@ -40,11 +40,14 @@ private:
     unsigned char _getAlignmentAverage();
     unsigned int _alignmentLimit;
     bool _grayed;
+    bool recording;
+    CvVideoWriter* writer ;
 
 private slots:
     void _tick();
     void _start();
     void _pause();
+    void _recVideo();
 
 protected:
     void _close();

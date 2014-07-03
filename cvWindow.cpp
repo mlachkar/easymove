@@ -15,6 +15,7 @@ cvWindow::cvWindow()
     _timer = new QTimer();
     this->_alignementValues = new char[this->_averageFrequency];
 
+    recording = false;
     _patchDetection = new patchDetection();
 
 }
@@ -169,6 +170,11 @@ void cvWindow::keyPressEvent(QKeyEvent* event)
             _start();
             break;
         }
+        case Qt::Key_R:
+        {
+            _recVideo();
+            break;
+        }
         break;
     }
 }
@@ -181,6 +187,26 @@ void cvWindow::_pause()
         _timer->start();
     }
 }
+
+void cvWindow::_recVideo()
+{
+    if (recording){
+
+        cvGrabFrame(_patchDetection->getCapture());
+        IplImage* img = cvRetrieveFrame(_patchDetection->getCapture());
+        writer = cvCreateVideoWriter("/home/ezmove/MonEnregistrement.avi",-1,20,cvSize(img->width,img->height),1);
+        cvWriteFrame(writer,img);
+     }
+    while(1) {
+
+     frames = cvQueryFrame(_patchDetection->getCapture());
+     if( !frames ) break;
+     cvShowImage( "Enregister ..... Appuyer sur Echap pour sortir !", frames );
+     cvWriteFrame( writer, frames );
+    }
+    cvReleaseVideoWriter( &writer );
+}
+
 
 void cvWindow::_start()
 {
@@ -198,6 +224,8 @@ void cvWindow::_start()
     // Start timer to read frames from the capture interface
     _timer->start(1000/_averageFrequency);
     QObject::connect(_timer, SIGNAL(timeout()), this, SLOT(_tick()));
+
+    recording = true;
 }
 
 void cvWindow::_close()
