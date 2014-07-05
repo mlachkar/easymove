@@ -6,7 +6,8 @@ SOURCES += main.cpp \
     cvWindow.cpp \
     patch.cpp \
     patchDetection.cpp \
-    speaker.cpp
+    speaker.cpp \
+    matchingpatches.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -15,7 +16,8 @@ HEADERS += \
     cvWindow.h \
     patch.h \
     patchDetection.h \
-    speaker.h
+    speaker.h \
+    matchingpatches.h
 
 ## OpenCV settings for Unix/Linux
 unix:!mac {

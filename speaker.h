@@ -2,11 +2,16 @@
 #define SPEAKER_H
 
 #include <festival/festival.h>
+#include <QThread>
 
-class speaker
+class speaker : public QThread
 {
+    Q_OBJECT
+
+protected:
+    void run();
+
 public:
-    speaker();
     void say(char*);
 };
 

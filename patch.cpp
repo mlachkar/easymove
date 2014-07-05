@@ -1,5 +1,11 @@
 #include <patch.h>
 
+Patch::Patch()
+    : QPoint(0,0), _color(0), _radius(0)
+{
+
+}
+
 Patch::Patch(int xcenter, int ycenter, int xmin, int ymin, int xmax, int ymax, unsigned char color) 
 :QPoint(xcenter, ycenter), _color(color)
 {
@@ -8,6 +14,14 @@ Patch::Patch(int xcenter, int ycenter, int xmin, int ymin, int xmax, int ymax, u
 
 unsigned int Patch::getRadius() const {
   return this->_radius;
+}
+
+void Patch::setRadius(int radius) {
+  this->_radius = radius;
+}
+
+void Patch::setColor(unsigned char color) {
+  this->_color = color;
 }
 
 unsigned char Patch::getColor() const {

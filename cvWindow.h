@@ -7,6 +7,7 @@
 
 #include <patchDetection.h>
 #include <speaker.h>
+#include <matchingpatches.h>
 
 class cvWindow : public QWidget
 {
@@ -25,7 +26,11 @@ public:
     unsigned char getAverageFrequency() const;
     void setAverageFrequency(unsigned char);
 
-    void _algo();
+    //void cvWindow::_maxDistance(Patch p1, Patch p2);
+
+    //void cvWindow::_algoCalibration(matchingPatches _matchingPatches);
+    void _algo(QPoint ref);
+
 private:
     QImage* _image;
     Qt::AspectRatioMode _ar_mode;
@@ -33,13 +38,12 @@ private:
     int _video_height;
     QTimer* _timer;
     patchDetection* _patchDetection;
-    
+    std::vector<matchingPatches*> _patchHistory;
+    speaker* _speaker;
+
     unsigned char _averageFrequency;
     unsigned char _frameNumberForAverage;
-    char* _alignementValues;
-    unsigned char _getAlignmentAverage();
     unsigned int _alignmentLimit;
-    bool _grayed;
     bool recording;
     CvVideoWriter* writer ;
 
@@ -47,7 +51,7 @@ private slots:
     void _tick();
     void _start();
     void _pause();
-    void _recVideo();
+//    void _recVideo();
 
 protected:
     void _close();

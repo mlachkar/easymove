@@ -7,16 +7,24 @@
 cvWindow::cvWindow()
 : _image(NULL), _ar_mode(Qt::KeepAspectRatio),
   _video_width(0), _video_height(0),
-  _averageFrequency(15), _alignmentLimit(2000)
+  _averageFrequency(25),
+  _frameNumberForAverage(0), _alignmentLimit(2000)
 {
     setWindowTitle(tr("EasyMove Demo"));
     resize(480, 240);
     
     _timer = new QTimer();
-    this->_alignementValues = new char[this->_averageFrequency];
 
     recording = false;
     _patchDetection = new patchDetection();
+
+    //_speaker = new speaker(this);
+    //_speaker->start();
+    //_speaker->moveToThread(speakerThread);
+    //speakerThread->start();
+
+
+    //_speaker->say("lower your ");
 
 }
 
@@ -67,6 +75,23 @@ void cvWindow::paintEvent(QPaintEvent* e)
 
     std::vector<Patch> p = this->_patchDetection->getDetectedPatches();
 
+    matchingPatches* _matchingPatches = matchingPatches::createIfMatching(p);
+
+    if (_matchingPatches != NULL) {
+        _frameNumberForAverage++;
+        _patchHistory.push_back(_matchingPatches);
+    } else {
+        _frameNumberForAverage = 0;
+        _patchHistory.clear();
+    }
+
+//    std::cout<< "chiffre" << _frameNumberForAverage << endl;
+    if ( _frameNumberForAverage == _averageFrequency)
+    {
+        _frameNumberForAverage = 0;
+        _patchHistory.clear();
+    }
+
     std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
 
     //Draw lines between patches
@@ -92,13 +117,13 @@ void cvWindow::paintEvent(QPaintEvent* e)
     std::vector<Patch>::const_iterator itr;
     for(itr = p.begin(); itr != p.end(); ++itr){
         _draw_patch(video_painter, (*itr));
-        _algo();
+
     }
 
 
     // Draw a frame from the video
     _draw_video_frame(painter);
-
+    _algo(QPoint(1,1));
     QWidget::paintEvent(e);
 }
 
@@ -170,11 +195,11 @@ void cvWindow::keyPressEvent(QKeyEvent* event)
             _start();
             break;
         }
-        case Qt::Key_R:
-        {
-            _recVideo();
-            break;
-        }
+//        case Qt::Key_R:
+//        {
+//            _recVideo();
+//            break;
+//        }
         break;
     }
 }
@@ -188,24 +213,24 @@ void cvWindow::_pause()
     }
 }
 
-void cvWindow::_recVideo()
-{
-    if (recording){
+//void cvWindow::_recVideo()
+//{
+//    if (recording){
 
-        cvGrabFrame(_patchDetection->getCapture());
-        IplImage* img = cvRetrieveFrame(_patchDetection->getCapture());
-        writer = cvCreateVideoWriter("/home/ezmove/MonEnregistrement.avi",-1,20,cvSize(img->width,img->height),1);
-        cvWriteFrame(writer,img);
-     }
-    while(1) {
+//        cvGrabFrame(_patchDetection->getCapture());
+//        IplImage* img = cvRetrieveFrame(_patchDetection->getCapture());
+//        writer = cvCreateVideoWriter("/home/ezmove/MonEnregistrement.avi",-1,20,cvSize(img->width,img->height),1);
+//        cvWriteFrame(writer,img);
+//     }
+//    while(1) {
 
-     frames = cvQueryFrame(_patchDetection->getCapture());
-     if( !frames ) break;
-     cvShowImage( "Enregister ..... Appuyer sur Echap pour sortir !", frames );
-     cvWriteFrame( writer, frames );
-    }
-    cvReleaseVideoWriter( &writer );
-}
+//     frames = cvQueryFrame(_patchDetection->getCapture());
+//     if( !frames ) break;
+//     cvShowImage( "Enregister ..... Appuyer sur Echap pour sortir !", frames );
+//     cvWriteFrame( writer, frames );
+//    }
+//    cvReleaseVideoWriter( &writer );
+//}
 
 
 void cvWindow::_start()
@@ -232,50 +257,48 @@ void cvWindow::_close()
 {
     emit closed();
 }
-    
-unsigned char cvWindow::_getAlignmentAverage() {
-  unsigned int sum = 0;
-  for (int i=0;i<this->_averageFrequency;i++) {
-    sum += this->_alignementValues[i];
-  }
-  return sum/this->_averageFrequency;
-}
-void cvWindow::_algo()
+
+
+//void cvWindow::_maxDistance(Patch p1, Patch p2)
+//{
+
+//}
+
+//void cvWindow::_algoCalibration(matchingPatches _matchingPatches)
+//{
+
+//}
+
+void cvWindow::_algo(QPoint ref)
 {
-    std::vector<Patch> p = this->_patchDetection->getDetectedPatches();
-    std::sort(p.begin(), p.end(), Patch::compareByX);
-    std::vector<Patch> pBlue;
-    std::vector<Patch> pRed;
-    speaker *_speaker = new speaker();
 
-    std::vector<Patch>::const_iterator itr;
-    for(itr = p.begin(); itr != p.end(); ++itr)
+    if (_frameNumberForAverage == _averageFrequency -1 )
     {
-        if((*itr).getColor() == BLUE)
-        {
-            pBlue.push_back(*itr);
-        }
-        else
-        {   pRed.push_back(*itr);
-//            std::cout << "pRed.size()" << pRed.size();
-//            std::cout <<""<< std::endl;
-        }
-    }
 
-    QPoint ref(100,100);
+        std::cout << static_cast<unsigned>(_frameNumberForAverage) << std::endl;
+        //_speaker->say("ok");
 
-    if(pRed.size()==1 && pBlue.size() == 0) // test avec un seul patch
-    {
-        if(p[0].getColor() == RED)
-        {
-            if (p[0].y() >= ref.y()){
+        if (_patchHistory.size() == 24)
+         {
 
-                _speaker->say("ok"); // Il faudrait faire une moyenne, sinon le speaker n'a pas le temps de parler pendant une frame
+            matchingPatches* averageMatchingPatches = matchingPatches::getAverage(_patchHistory);
+
+            switch(ref.y() > averageMatchingPatches->getElbow().y())
+            {
+                case 0:
+                {
+                //_speaker->say("raise your");
+                break;
+                }
+                case 1:
+                {
+                //_speaker->say("lower your");
+                }
+
             }
-            std::cout << "Que la correction commence !" << std::endl;
-
         }
 
-    }
+     }
+
 }
 
