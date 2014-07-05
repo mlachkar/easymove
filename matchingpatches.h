@@ -11,6 +11,7 @@ public:
     static matchingPatches* createIfMatching(std::vector<Patch> p);
     static matchingPatches* getAverage(std::vector<matchingPatches*> p);
     Patch getElbow();
+    Patch getBow();
 
 private:
     Patch elbow;

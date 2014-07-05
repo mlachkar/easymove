@@ -34,4 +34,7 @@ unix:!mac {
         -leststring
 }
 
-OTHER_FILES +=
+ICON = logo.png
+
+OTHER_FILES += \
+    logo.png

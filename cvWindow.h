@@ -22,14 +22,10 @@ public:
 
     void paintEvent(QPaintEvent* e);
     void keyPressEvent(QKeyEvent* event);
+    void mousePressEvent(QMouseEvent *e);
     
     unsigned char getAverageFrequency() const;
     void setAverageFrequency(unsigned char);
-
-    //void cvWindow::_maxDistance(Patch p1, Patch p2);
-
-    //void cvWindow::_algoCalibration(matchingPatches _matchingPatches);
-    void _algo(QPoint ref);
 
 private:
     QImage* _image;
@@ -41,11 +37,17 @@ private:
     std::vector<matchingPatches*> _patchHistory;
     speaker* _speaker;
 
+    unsigned char _calibrationLimit;
     unsigned char _averageFrequency;
+    bool _correctionStep;
     unsigned char _frameNumberForAverage;
     unsigned int _alignmentLimit;
     bool recording;
-    CvVideoWriter* writer ;
+    CvVideoWriter* writer;
+
+    int _height;
+    int _maxDistanceHeightInHistory();
+    void _algo();
 
 private slots:
     void _tick();

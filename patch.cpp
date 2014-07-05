@@ -1,7 +1,7 @@
 #include <patch.h>
 
 Patch::Patch()
-    : QPoint(0,0), _color(0), _radius(0)
+    : QPoint(0,0), _radius(0), _color(0)
 {
 
 }

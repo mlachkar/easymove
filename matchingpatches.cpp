@@ -42,18 +42,18 @@ matchingPatches* matchingPatches::createIfMatching(std::vector<Patch> p)
 matchingPatches* matchingPatches::getAverage(std::vector<matchingPatches*> p)
 {
     matchingPatches* average = new matchingPatches();
-    int elbow_radius;
-    int bow_radius;
-    int center_radius;
-    unsigned char elbow_color;
-    unsigned char center_color;
-    unsigned char bow_color;
-    int elbow_x;
-    int elbow_y;
-    float center_x;
-    float center_y;
-    float bow_x;
-    float bow_y;
+    int elbow_radius = 0;
+    int bow_radius = 0;
+    int center_radius = 0;
+    unsigned char elbow_color = 0;
+    unsigned char center_color = 0;
+    unsigned char bow_color = 0;
+    int elbow_x = 0;
+    int elbow_y = 0;
+    float center_x = 0;
+    float center_y = 0;
+    float bow_x = 0;
+    float bow_y = 0;
 
     std::vector<matchingPatches*>::const_iterator itr;
     for(itr = p.begin(); itr != p.end(); ++itr){
@@ -92,4 +92,8 @@ matchingPatches* matchingPatches::getAverage(std::vector<matchingPatches*> p)
 
 Patch matchingPatches::getElbow() {
     return elbow;
+}
+
+Patch matchingPatches::getBow() {
+    return bow;
 }

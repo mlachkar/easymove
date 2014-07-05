@@ -7,16 +7,19 @@
 cvWindow::cvWindow()
 : _image(NULL), _ar_mode(Qt::KeepAspectRatio),
   _video_width(0), _video_height(0),
-  _averageFrequency(25),
-  _frameNumberForAverage(0), _alignmentLimit(2000)
+  _calibrationLimit(60), _averageFrequency(25),
+  _correctionStep(true), _frameNumberForAverage(0),
+  _alignmentLimit(2000), _height(0)
 {
     setWindowTitle(tr("EasyMove Demo"));
-    resize(480, 240);
+    resize(350, 350);
     
     _timer = new QTimer();
 
     recording = false;
     _patchDetection = new patchDetection();
+
+    setWindowIcon(QIcon("logo.png"));
 
     //_speaker = new speaker(this);
     //_speaker->start();
@@ -65,8 +68,10 @@ void cvWindow::paintEvent(QPaintEvent* e)
     // When no image is loaded, paint the window with black
     if (!_image)
     {
-        painter.fillRect(QRectF(QPoint(0, 0), QSize(width(), height())), Qt::black);
-        QWidget::paintEvent(e);
+        setCursor(Qt::PointingHandCursor);
+        painter.fillRect(QRectF(QPoint(0, 0), QSize(width(), height())), Qt::white);
+        painter.drawImage(QRect(350/2 - 268/2, 10, 268, 268), QImage("logo.png"));
+        painter.drawText(0, 300, 350, 60, Qt::AlignHCenter, "Click to begin capture...");
         return;
     }
 
@@ -85,45 +90,63 @@ void cvWindow::paintEvent(QPaintEvent* e)
         _patchHistory.clear();
     }
 
-//    std::cout<< "chiffre" << _frameNumberForAverage << endl;
-    if ( _frameNumberForAverage == _averageFrequency)
-    {
-        _frameNumberForAverage = 0;
-        _patchHistory.clear();
-    }
+    if (_correctionStep) {
 
-    std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
-
-    //Draw lines between patches
-    std::sort(p.begin(), p.end(), Patch::compareByX);
-    if( second != end )
-    {
-       for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
+        if ( _frameNumberForAverage == _averageFrequency)
         {
-            video_painter.setPen(QPen(QColor("#ff0080")));
-            QPoint r1(0,(*first).getRadius());
-            QPoint r2(0,(*second).getRadius());
-            QPoint p1 = (QPoint)*first += r1;
-            QPoint p2 = (QPoint)*second += r2;
-            QPoint p3 = (QPoint)*first -= r1;
-            QPoint p4 = (QPoint)*second -= r2;
-            video_painter.drawLine(p1, p2);
-            video_painter.drawLine(p3, p4);
-            video_painter.drawLine(*first, *second);
-       }
+            _frameNumberForAverage = 0;
+            _patchHistory.clear();
+        }
+
+        std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
+
+        //Draw lines between patches
+        std::sort(p.begin(), p.end(), Patch::compareByX);
+        if( second != end )
+        {
+           for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
+            {
+                video_painter.setPen(QPen(QColor("#ff0080")));
+                QPoint r1(0,(*first).getRadius());
+                QPoint r2(0,(*second).getRadius());
+                QPoint p1 = (QPoint)*first += r1;
+                QPoint p2 = (QPoint)*second += r2;
+                QPoint p3 = (QPoint)*first -= r1;
+                QPoint p4 = (QPoint)*second -= r2;
+                video_painter.drawLine(p1, p2);
+                video_painter.drawLine(p3, p4);
+                video_painter.drawLine(*first, *second);
+           }
+        }
+
+        if (_height != 0) {
+            video_painter.setPen(QPen(Qt::black));
+            video_painter.drawLine(QPoint(0, _height), QPoint(_video_width, _height));
+        }
+
+        _algo();
+    } else {
+        if ( _frameNumberForAverage == _calibrationLimit)
+        {
+            _frameNumberForAverage = 0;
+            _height = _maxDistanceHeightInHistory();
+            _patchHistory.clear();
+            std::cout << "Found : " << _height << endl;
+            _correctionStep = true;
+        }
+
     }
 
+    // draw patches anyway
     video_painter.setPen(QPen(Qt::black));
     std::vector<Patch>::const_iterator itr;
     for(itr = p.begin(); itr != p.end(); ++itr){
         _draw_patch(video_painter, (*itr));
-
     }
 
 
     // Draw a frame from the video
     _draw_video_frame(painter);
-    _algo(QPoint(1,1));
     QWidget::paintEvent(e);
 }
 
@@ -172,6 +195,9 @@ void cvWindow::_draw_patch(QPainter& painter, Patch p)
     } else {
         painter.setBrush(QBrush(QColor(255, 128, 128, 128)));
     }
+    if ((_height != 0) && (abs(p.y() - _height) < 20)) {
+        painter.setBrush(QBrush(QColor(128, 255, 128, 128)));
+    }
     painter.drawEllipse( p, p.getRadius(), p.getRadius());
 }
 
@@ -195,12 +221,37 @@ void cvWindow::keyPressEvent(QKeyEvent* event)
             _start();
             break;
         }
+        case Qt::Key_C:
+        {
+            _correctionStep = false;
+            _frameNumberForAverage = 0;
+            _patchHistory.clear();
+            break;
+        }
+        case Qt::Key_H:
+        {
+            _height = _video_height / 2;
+            break;
+        }
 //        case Qt::Key_R:
 //        {
 //            _recVideo();
 //            break;
 //        }
         break;
+    }
+}
+
+void cvWindow::mousePressEvent(QMouseEvent *e)
+{
+    if(e->buttons() == Qt::LeftButton)
+    {
+        _start();
+        return;
+    }
+    if(e->buttons() == Qt::RightButton) {
+        _pause();
+        return;
     }
 }
 
@@ -232,7 +283,6 @@ void cvWindow::_pause()
 //    cvReleaseVideoWriter( &writer );
 //}
 
-
 void cvWindow::_start()
 {
     if (_timer->isActive()) {
@@ -240,7 +290,7 @@ void cvWindow::_start()
     }
     _video_width = _patchDetection->getWidth();
     _video_height = _patchDetection->getHeight();
-    
+
     // Resize the window to fit video dimensions
     resize(_video_width, _video_height);
 
@@ -250,7 +300,7 @@ void cvWindow::_start()
     _timer->start(1000/_averageFrequency);
     QObject::connect(_timer, SIGNAL(timeout()), this, SLOT(_tick()));
 
-    recording = true;
+    setCursor(Qt::ArrowCursor);
 }
 
 void cvWindow::_close()
@@ -259,31 +309,31 @@ void cvWindow::_close()
 }
 
 
-//void cvWindow::_maxDistance(Patch p1, Patch p2)
-//{
+int cvWindow::_maxDistanceHeightInHistory()
+{
+    int maxDistance = 0;
+    int height = 0;
+    std::vector<matchingPatches*>::const_iterator itr;
+    for(itr = _patchHistory.begin(); itr != _patchHistory.end(); ++itr){
+        int tmpDistance = abs((*itr)->getElbow().x() - (*itr)->getBow().x());
+        if (maxDistance < tmpDistance) {
+            maxDistance = tmpDistance;
+            height = ((*itr)->getElbow().y() + (*itr)->getBow().y())/2;
+        }
+    }
+    return height;
+}
 
-//}
-
-//void cvWindow::_algoCalibration(matchingPatches _matchingPatches)
-//{
-
-//}
-
-void cvWindow::_algo(QPoint ref)
+void cvWindow::_algo()
 {
 
     if (_frameNumberForAverage == _averageFrequency -1 )
     {
-
-        std::cout << static_cast<unsigned>(_frameNumberForAverage) << std::endl;
-        //_speaker->say("ok");
-
         if (_patchHistory.size() == 24)
          {
-
             matchingPatches* averageMatchingPatches = matchingPatches::getAverage(_patchHistory);
 
-            switch(ref.y() > averageMatchingPatches->getElbow().y())
+            switch(_height > averageMatchingPatches->getElbow().y())
             {
                 case 0:
                 {
@@ -294,11 +344,8 @@ void cvWindow::_algo(QPoint ref)
                 {
                 //_speaker->say("lower your");
                 }
-
             }
         }
-
      }
-
 }
 
