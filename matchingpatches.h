@@ -20,6 +20,4 @@ private:
     bool toRight;
 };
 
-
-
 #endif // MATCHINGPATCHES_H

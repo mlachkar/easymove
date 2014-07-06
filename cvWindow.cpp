@@ -20,15 +20,6 @@ cvWindow::cvWindow()
     _patchDetection = new patchDetection();
 
     setWindowIcon(QIcon("logo.png"));
-
-    //_speaker = new speaker(this);
-    //_speaker->start();
-    //_speaker->moveToThread(speakerThread);
-    //speakerThread->start();
-
-
-    //_speaker->say("lower your ");
-
 }
 
 cvWindow::~cvWindow()
@@ -337,12 +328,14 @@ void cvWindow::_algo()
             {
                 case 0:
                 {
-                //_speaker->say("raise your");
+                    speaker* speakerThread = new speaker("lower your");
+                    speakerThread->start();
                 break;
                 }
                 case 1:
                 {
-                //_speaker->say("lower your");
+                    speaker* speakerThread = new speaker("lower your");
+                    speakerThread->start();
                 }
             }
         }

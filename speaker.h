@@ -7,12 +7,13 @@
 class speaker : public QThread
 {
     Q_OBJECT
-
-protected:
-    void run();
+    void run() Q_DECL_OVERRIDE;
 
 public:
-    void say(char*);
+    speaker(const char* string);
+
+private:
+    const char* _string;
 };
 
 #endif // SPEAKER_H

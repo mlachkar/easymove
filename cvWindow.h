@@ -35,7 +35,6 @@ private:
     QTimer* _timer;
     patchDetection* _patchDetection;
     std::vector<matchingPatches*> _patchHistory;
-    speaker* _speaker;
 
     unsigned char _calibrationLimit;
     unsigned char _averageFrequency;
