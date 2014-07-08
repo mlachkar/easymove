@@ -7,7 +7,7 @@
 cvWindow::cvWindow()
 : _image(NULL), _ar_mode(Qt::KeepAspectRatio),
   _video_width(0), _video_height(0),
-  _calibrationLimit(60), _averageFrequency(25),
+  _calibrationLimit(60), _averageFrequency(15),
   _correctionStep(true), _frameNumberForAverage(0),
   _alignmentLimit(2000), _height(0)
 {
@@ -314,31 +314,92 @@ int cvWindow::_maxDistanceHeightInHistory()
     }
     return height;
 }
+int max_distance(int d1, int d2, int d3)
+{
+    if((d1 >= d2) & (d1 >= d3))
+        return d1;
+
+    else if( (d2 > d1) & (d2 > d3))
+        return d2;
+
+    else return d3;
+}
 
 void cvWindow::_algo()
 {
 
+
     if (_frameNumberForAverage == _averageFrequency -1 )
     {
-        if (_patchHistory.size() == 24)
-         {
+        if (_patchHistory.size() == 14)
+        {
             matchingPatches* averageMatchingPatches = matchingPatches::getAverage(_patchHistory);
 
-            switch(_height > averageMatchingPatches->getElbow().y())
+            int distance_elbow_height = abs( averageMatchingPatches->getElbow().y() - _height);
+            int distance_bow_height = abs( averageMatchingPatches->getBow().y() - _height);
+            int distance_center_height = abs( averageMatchingPatches->getCenter().y() - _height);
+
+            int _max_distance = max_distance(distance_elbow_height,distance_center_height,distance_center_height);
+
+            switch(_max_distance)
             {
+            case distance_elbow_height:
+            {
+                switch(_height < averageMatchingPatches->getElbow().y())
+                {
                 case 0:
                 {
-                    speaker* speakerThread = new speaker("lower your");
+                    speaker* speakerThread = new speaker("lower yuur elbow");
                     speakerThread->start();
-                break;
+                    break;
                 }
                 case 1:
                 {
-                    speaker* speakerThread = new speaker("lower your");
+                    speaker* speakerThread = new speaker("raise yuur elbow");
                     speakerThread->start();
+                    break;
+                }
                 }
             }
+            case distance_bow_height:
+            {
+                switch(_height < averageMatchingPatches->getBow().y())
+                {
+                case 0:
+                {
+                    speaker* speakerThread = new speaker("lower yuur bow");
+                    speakerThread->start();
+                    break;
+                }
+                case 1:
+                {
+                    speaker* speakerThread = new speaker("raise yuur bow");
+                    speakerThread->start();
+                    break;
+                }
+                }
+            }
+            case distance_center_height:
+            {
+                switch(_height < averageMatchingPatches->getCenter().y())
+                {
+                case 0:
+                {
+                    speaker* speakerThread = new speaker("lower yuur hand");
+                    speakerThread->start();
+                    break;
+                }
+                case 1:
+                {
+                    speaker* speakerThread = new speaker("raise yuur hand");
+                    speakerThread->start();
+                    break;
+                }
+                }
+            }
+            }
         }
-     }
+
+    }
 }
 

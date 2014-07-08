@@ -12,6 +12,7 @@ public:
     static matchingPatches* getAverage(std::vector<matchingPatches*> p);
     Patch getElbow();
     Patch getBow();
+    Patch getCenter();
 
 private:
     Patch elbow;
