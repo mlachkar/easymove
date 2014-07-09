@@ -22,8 +22,7 @@ cvWindow::cvWindow()
 
     setWindowIcon(QIcon("logo.png"));
 
-
-
+    speakerThread = new speaker("welcome");
 
 }
 
@@ -341,7 +340,7 @@ void cvWindow::_algo()
             int distance_bow_height = abs( averageMatchingPatches->getBow().y() - _height);
             int distance_center_height = abs( averageMatchingPatches->getCenter().y() - _height);
 
-            int _max_distance = max_distance(max_distance(distance_elbow_height,distance_center_height),distance_center_height);
+            int _max_distance = max_distance(max_distance(distance_elbow_height,distance_bow_height),distance_center_height);
 
             if( _max_distance == distance_elbow_height)
             {
@@ -350,14 +349,19 @@ void cvWindow::_algo()
                 {
                 case 0:
                 {
-                    speaker* speakerThread = new speaker("lower yuur elbow");
-                    speakerThread->start();
+//                    speaker* speakerThread = new speaker("lower yuur elbow");
+                   speakerThread->setString("lower yuur elbow");
+                   speakerThread->start();
+                    //speakerThread->start();
                     break;
                 }
                 case 1:
                 {
-                    speaker* speakerThread = new speaker("raise yuur elbow");
+                    //speaker* speakerThread = new speaker("raise yuur elbow");
+
+                    speakerThread->setString("Rqise yuur elbow");
                     speakerThread->start();
+//                    speakerThread->start();
                     break;
                 }
                 }
@@ -368,14 +372,18 @@ void cvWindow::_algo()
                 {
                 case 0:
                 {
-                    speaker* speakerThread = new speaker("lower yuur bow");
+                    //speaker* speakerThread = new speaker("lower yuur bow");
+                    speakerThread->setString("lower yuur elbow");
                     speakerThread->start();
+//                    speakerThread->start();
                     break;
                 }
                 case 1:
                 {
-                    speaker* speakerThread = new speaker("raise yuur bow");
+                    //speaker* speakerThread = new speaker("raise yuur bow");
+                    speakerThread->setString("Rqise yuur elbow");
                     speakerThread->start();
+//                    speakerThread->start();
                     break;
                 }
                 }
@@ -387,14 +395,18 @@ void cvWindow::_algo()
                 {
                 case 0:
                 {
-                    speaker* speakerThread = new speaker("lower yuur hand");
+                    speakerThread->setString("lower yuur elbow");
                     speakerThread->start();
+                    //speaker* speakerThread = new speaker("lower yuur hand");
+//                    speakerThread->start();
                     break;
                 }
                 case 1:
                 {
-                    speaker* speakerThread = new speaker("raise yuur hand");
+                    //speaker* speakerThread = new speaker("raise yuur hand");
+                    speakerThread->setString("Rqise yuur elbow");
                     speakerThread->start();
+//                    speakerThread->start();
                     break;
                 }
                 }

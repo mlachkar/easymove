@@ -12,6 +12,7 @@ class speaker : public QThread
 public:
     speaker(const char* string);
 
+    void setString(const char* string);
 private:
     const char* _string;
 };

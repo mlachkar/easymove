@@ -6,6 +6,11 @@ speaker::speaker(const char* string)
     _string = string;
 }
 
+void speaker::setString(const char *string)
+{
+    _string = string;
+}
+
 void speaker::run()
 {
     int heap_size = 2100000;  // default scheme heap size
