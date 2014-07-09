@@ -12,7 +12,7 @@ cvWindow::cvWindow()
   _correctionStep(true), _frameNumberForAverage(0),
   _alignmentLimit(2000), _height(0)
 {
-    setWindowTitle(tr("EasyMove Demo"));
+    setWindowTitle(tr("ezMove Demo"));
     resize(937, 937);
     
     _timer = new QTimer();
@@ -185,15 +185,26 @@ void cvWindow::_draw_video_frame(QPainter& painter)
 
 void cvWindow::_draw_patch(QPainter& painter, Patch p)
 {
-    if (p.getColor() == BLUE) {
-        painter.setBrush(QBrush(QColor(128, 128, 255, 128)));
-    } else {
-        painter.setBrush(QBrush(QColor(255, 128, 128, 128)));
-    }
+    QColor crossColor;
     if ((_height != 0) && (abs(p.y() - _height) < 20)) {
-        painter.setBrush(QBrush(QColor(128, 255, 128, 128)));
+        crossColor = QColor(128, 255, 128, 255);
+    } else {
+        crossColor = QColor(255, 127, 0);
     }
+
+    painter.setPen(QPen(crossColor));
+    painter.setBrush(QBrush(crossColor));
     painter.drawEllipse( p, p.getRadius(), p.getRadius());
+
+    painter.setBrush(QBrush(Qt::white));
+    painter.drawEllipse( p, 4*p.getRadius()/5, 4*p.getRadius()/5);
+
+    int crossHeight = 5*p.getRadius()/6;
+    int crossWidth = p.getRadius()/10;
+
+    painter.setBrush(QBrush(crossColor));
+    painter.drawRoundedRect(p.x() - crossHeight/2, p.y() - crossWidth/2, crossHeight, crossWidth, crossWidth/2, crossWidth/2);
+    painter.drawRoundedRect(p.x() - crossWidth/2, p.y() - crossHeight/2, crossWidth, crossHeight, crossWidth/2, crossWidth/2);
 }
 
 void cvWindow::keyPressEvent(QKeyEvent* event)
