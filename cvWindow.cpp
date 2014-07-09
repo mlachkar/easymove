@@ -314,15 +314,12 @@ int cvWindow::_maxDistanceHeightInHistory()
     }
     return height;
 }
-int max_distance(int d1, int d2, int d3)
+int cvWindow::max_distance(int d1, int d2)
 {
-    if((d1 >= d2) & (d1 >= d3))
+    if(d1 >= d2)
         return d1;
+    else return d2;
 
-    else if( (d2 > d1) & (d2 > d3))
-        return d2;
-
-    else return d3;
 }
 
 void cvWindow::_algo()
@@ -339,12 +336,11 @@ void cvWindow::_algo()
             int distance_bow_height = abs( averageMatchingPatches->getBow().y() - _height);
             int distance_center_height = abs( averageMatchingPatches->getCenter().y() - _height);
 
-            int _max_distance = max_distance(distance_elbow_height,distance_center_height,distance_center_height);
+            int _max_distance = max_distance(max_distance(distance_elbow_height,distance_center_height),distance_center_height);
 
-            switch(_max_distance)
+            if( _max_distance == distance_elbow_height)
             {
-            case distance_elbow_height:
-            {
+
                 switch(_height < averageMatchingPatches->getElbow().y())
                 {
                 case 0:
@@ -361,7 +357,7 @@ void cvWindow::_algo()
                 }
                 }
             }
-            case distance_bow_height:
+            else if( _max_distance == distance_bow_height)
             {
                 switch(_height < averageMatchingPatches->getBow().y())
                 {
@@ -379,7 +375,8 @@ void cvWindow::_algo()
                 }
                 }
             }
-            case distance_center_height:
+            else
+
             {
                 switch(_height < averageMatchingPatches->getCenter().y())
                 {
@@ -397,9 +394,11 @@ void cvWindow::_algo()
                 }
                 }
             }
-            }
-        }
-
     }
+  }
 }
+
+
+
+
 
