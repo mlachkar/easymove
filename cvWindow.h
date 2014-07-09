@@ -44,6 +44,7 @@ private:
     bool recording;
     CvVideoWriter* writer;
 
+    speaker* speakerThread ;
     int max_distance(int d1, int d2);
     int _height;
     int _maxDistanceHeightInHistory();
