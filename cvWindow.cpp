@@ -23,7 +23,6 @@ cvWindow::cvWindow()
     setWindowIcon(QIcon("logo.png"));
 
     speakerThread = new speaker("welcome");
-
 }
 
 cvWindow::~cvWindow()
@@ -306,7 +305,6 @@ void cvWindow::_close()
     emit closed();
 }
 
-
 int cvWindow::_maxDistanceHeightInHistory()
 {
     int maxDistance = 0;
@@ -323,19 +321,17 @@ int cvWindow::_maxDistanceHeightInHistory()
 }
 int cvWindow::maxDistance(int d1, int d2)
 {
-    if(d1 >= d2)
+    if(d1 > d2)
         return d1;
-    else return d2;
-
+    else
+        return d2;
 }
 
 void cvWindow::_algo()
 {
-
-
-    if (_frameNumberForAverage == _averageFrequency -1 )
+    if (_frameNumberForAverage == _averageFrequency - 1 )
     {
-        if (_patchHistory.size() == 14)
+        if (_patchHistory.size() == _averageFrequency - 1 )
         {
             matchingPatches* averageMatchingPatches = matchingPatches::getAverage(_patchHistory);
 
@@ -347,73 +343,62 @@ void cvWindow::_algo()
 
             if( _maxDistance == distance_elbow_height)
             {
-
                 switch(_height < averageMatchingPatches->getElbow().y())
                 {
-                case 0:
-                {
-                   speakerThread->setString("lower yuur elbow");
-                   speakerThread->start();
+                    case 0:
+                    {
+                        speakerThread->setString("lower yuur elbow");
+                        speakerThread->start();
+                        break;
+                    }
+                    case 1:
+                    {
 
-                    break;
-                }
-                case 1:
-                {
-
-                    speakerThread->setString("Raise yuur elbow");
-                    speakerThread->start();
-
-                    break;
-                }
+                        speakerThread->setString("Raise yuur elbow");
+                        speakerThread->start();
+                        break;
+                    }
                 }
             }
             else if( _maxDistance == distance_bow_height)
             {
                 switch(_height < averageMatchingPatches->getBow().y())
                 {
-                case 0:
-                {
+                    case 0:
+                    {
 
-                    speakerThread->setString("lower yuur bow");
-                    speakerThread->start();
+                        speakerThread->setString("lower yuur bow");
+                        speakerThread->start();
 
-                    break;
-                }
-                case 1:
-                {
+                        break;
+                    }
+                    case 1:
+                    {
 
-                    speakerThread->setString("Raise yuur bow");
-                    speakerThread->start();
-                    break;
-                }
+                        speakerThread->setString("Raise yuur bow");
+                        speakerThread->start();
+                        break;
+                    }
                 }
             }
             else
-
             {
                 switch(_height < averageMatchingPatches->getCenter().y())
                 {
-                case 0:
-                {
-                    speakerThread->setString("lower yuur hand");
-                    speakerThread->start();
-
-                    break;
-                }
-                case 1:
-                {
-                    speakerThread->setString("Raise yuur hand");
-                    speakerThread->start();
-
-                    break;
-                }
+                    case 0:
+                    {
+                        speakerThread->setString("lower yuur hand");
+                        speakerThread->start();
+                        break;
+                    }
+                    case 1:
+                    {
+                        speakerThread->setString("Raise yuur hand");
+                        speakerThread->start();
+                        break;
+                    }
                 }
             }
+        }
     }
-  }
 }
-
-
-
-
-
