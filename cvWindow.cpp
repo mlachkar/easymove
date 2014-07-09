@@ -1,5 +1,6 @@
 #include <cvWindow.h>
 
+#include <mainwindow.h>
 #include <QPainter>
 #include <QTimer>
 #include <QApplication>
@@ -20,6 +21,10 @@ cvWindow::cvWindow()
     _patchDetection = new patchDetection();
 
     setWindowIcon(QIcon("logo.png"));
+
+
+
+
 }
 
 cvWindow::~cvWindow()
