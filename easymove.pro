@@ -7,7 +7,8 @@ SOURCES += main.cpp \
     patch.cpp \
     patchDetection.cpp \
     speaker.cpp \
-    matchingpatches.cpp
+    matchingpatches.cpp \
+    mainwindow.cpp
 
 # Default rules for deployment.
 include(deployment.pri)
@@ -17,7 +18,8 @@ HEADERS += \
     patch.h \
     patchDetection.h \
     speaker.h \
-    matchingpatches.h
+    matchingpatches.h \
+    mainwindow.h
 
 ## OpenCV settings for Unix/Linux
 unix:!mac {
@@ -38,3 +40,6 @@ ICON = logo.png
 
 OTHER_FILES += \
     logo.png
+
+FORMS += \
+    mainwindow.ui
