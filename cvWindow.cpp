@@ -93,30 +93,29 @@ void cvWindow::paintEvent(QPaintEvent* e)
             _patchHistory.clear();
         }
 
-        std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
+//        std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
 
         //Draw lines between patches
-        std::sort(p.begin(), p.end(), Patch::compareByX);
-        if( second != end )
-        {
-           for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
-            {
-                video_painter.setPen(QPen(QColor("#ff0080")));
-                QPoint r1(0,(*first).getRadius());
-                QPoint r2(0,(*second).getRadius());
-                QPoint p1 = (QPoint)*first += r1;
-                QPoint p2 = (QPoint)*second += r2;
-                QPoint p3 = (QPoint)*first -= r1;
-                QPoint p4 = (QPoint)*second -= r2;
-                video_painter.drawLine(p1, p2);
-                video_painter.drawLine(p3, p4);
-                video_painter.drawLine(*first, *second);
-           }
-        }
+//        std::sort(p.begin(), p.end(), Patch::compareByX);
+//        if( second != end )
+//        {
+//           for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
+//            {
+//                video_painter.setPen(QPen(QColor("#ff0080")));
+//                QPoint r1(0,(*first).getRadius());
+//                QPoint r2(0,(*second).getRadius());
+//                QPoint p1 = (QPoint)*first += r1;
+//                QPoint p2 = (QPoint)*second += r2;
+//                QPoint p3 = (QPoint)*first -= r1;
+//                QPoint p4 = (QPoint)*second -= r2;
+//                video_painter.drawLine(p1, p2);
+//                video_painter.drawLine(p3, p4);
+//                video_painter.drawLine(*first, *second);
+//           }
+//        }
 
         if (_height != 0) {
-            video_painter.setPen(QPen(Qt::black));
-            video_painter.drawLine(QPoint(0, _height), QPoint(_video_width, _height));
+            _drawHorizontalBar(video_painter, _matchingPatches);
         }
 
         _algo();
@@ -136,16 +135,16 @@ void cvWindow::paintEvent(QPaintEvent* e)
     video_painter.setPen(QPen(Qt::black));
     std::vector<Patch>::const_iterator itr;
     for(itr = p.begin(); itr != p.end(); ++itr){
-        _draw_patch(video_painter, (*itr));
+        _drawPatch(video_painter, (*itr));
     }
 
 
     // Draw a frame from the video
-    _draw_video_frame(painter);
+    _drawVideoFrame(painter);
     QWidget::paintEvent(e);
 }
 
-void cvWindow::_draw_video_frame(QPainter& painter)
+void cvWindow::_drawVideoFrame(QPainter& painter)
 {
     switch (_ar_mode)
     {
@@ -183,7 +182,24 @@ void cvWindow::_draw_video_frame(QPainter& painter)
     }
 }
 
-void cvWindow::_draw_patch(QPainter& painter, Patch p)
+void cvWindow::_drawHorizontalBar(QPainter& painter, matchingPatches* p)
+{
+    painter.setPen(QPen(QColor(255, 255, 255, 255)));
+    if (p == NULL) {
+        painter.setBrush(QBrush(QColor(255, 255, 255, 128)));
+    } else {
+        int maxD = maxDistance(maxDistance(abs(p->getElbow().y() - _height), abs(p->getBow().y() - _height)),  abs(p->getCenter().y() - _height));
+
+        if (maxD < _video_height/8) {
+            painter.setBrush(QBrush(QColor(128, 255, 128, 128)));
+        } else {
+            painter.setBrush(QBrush(QColor(255, 255, 255, 128)));
+        }
+    }
+    painter.drawRect(-5, _height - _video_height/16, _video_width + 10, _video_height/8);
+}
+
+void cvWindow::_drawPatch(QPainter& painter, Patch p)
 {
     QColor crossColor;
     if ((_height != 0) && (abs(p.y() - _height) < 20)) {
@@ -239,11 +255,6 @@ void cvWindow::keyPressEvent(QKeyEvent* event)
             _height = _video_height / 2;
             break;
         }
-//        case Qt::Key_R:
-//        {
-//            _recVideo();
-//            break;
-//        }
         break;
     }
 }
@@ -269,25 +280,6 @@ void cvWindow::_pause()
         _timer->start();
     }
 }
-
-//void cvWindow::_recVideo()
-//{
-//    if (recording){
-
-//        cvGrabFrame(_patchDetection->getCapture());
-//        IplImage* img = cvRetrieveFrame(_patchDetection->getCapture());
-//        writer = cvCreateVideoWriter("/home/ezmove/MonEnregistrement.avi",-1,20,cvSize(img->width,img->height),1);
-//        cvWriteFrame(writer,img);
-//     }
-//    while(1) {
-
-//     frames = cvQueryFrame(_patchDetection->getCapture());
-//     if( !frames ) break;
-//     cvShowImage( "Enregister ..... Appuyer sur Echap pour sortir !", frames );
-//     cvWriteFrame( writer, frames );
-//    }
-//    cvReleaseVideoWriter( &writer );
-//}
 
 void cvWindow::_start()
 {
@@ -329,7 +321,7 @@ int cvWindow::_maxDistanceHeightInHistory()
     }
     return height;
 }
-int cvWindow::max_distance(int d1, int d2)
+int cvWindow::maxDistance(int d1, int d2)
 {
     if(d1 >= d2)
         return d1;
@@ -351,9 +343,9 @@ void cvWindow::_algo()
             int distance_bow_height = abs( averageMatchingPatches->getBow().y() - _height);
             int distance_center_height = abs( averageMatchingPatches->getCenter().y() - _height);
 
-            int _max_distance = max_distance(max_distance(distance_elbow_height,distance_bow_height),distance_center_height);
+            int _maxDistance = maxDistance(maxDistance(distance_elbow_height,distance_bow_height),distance_center_height);
 
-            if( _max_distance == distance_elbow_height)
+            if( _maxDistance == distance_elbow_height)
             {
 
                 switch(_height < averageMatchingPatches->getElbow().y())
@@ -375,7 +367,7 @@ void cvWindow::_algo()
                 }
                 }
             }
-            else if( _max_distance == distance_bow_height)
+            else if( _maxDistance == distance_bow_height)
             {
                 switch(_height < averageMatchingPatches->getBow().y())
                 {
@@ -392,7 +384,6 @@ void cvWindow::_algo()
 
                     speakerThread->setString("Raise yuur bow");
                     speakerThread->start();
-//                    speakerThread->start();
                     break;
                 }
                 }

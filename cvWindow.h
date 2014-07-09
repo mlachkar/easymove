@@ -17,8 +17,9 @@ public:
     cvWindow();
     ~cvWindow();
 
-    void _draw_video_frame(QPainter& painter);
-    void _draw_patch(QPainter& painter, Patch p);
+    void _drawVideoFrame(QPainter& painter);
+    void _drawPatch(QPainter& painter, Patch p);
+    void _drawHorizontalBar(QPainter& painter, matchingPatches* p);
 
     void paintEvent(QPaintEvent* e);
     void keyPressEvent(QKeyEvent* event);
@@ -44,7 +45,7 @@ private:
     bool recording;
     CvVideoWriter* writer;
 
-    int max_distance(int d1, int d2);
+    int maxDistance(int d1, int d2);
     int _height;
     speaker* speakerThread ;
     int _maxDistanceHeightInHistory();
