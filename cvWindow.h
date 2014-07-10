@@ -5,16 +5,23 @@
 #include <QImage>
 #include <QKeyEvent>
 
+/* --------------------------*/
+#include <QAction>
+#include <QMainWindow>
+#include "interfacereglages.h"
+/* --------------------------*/
+
+
 #include <patchDetection.h>
 #include <speaker.h>
 #include <matchingpatches.h>
 
-class cvWindow : public QWidget
+class cvWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    cvWindow();
+    cvWindow(QWidget* parent = NULL, Qt::WindowFlags flags = 0);
     ~cvWindow();
 
     void _drawVideoFrame(QPainter& painter);
@@ -59,6 +66,14 @@ private slots:
     void _start();
     void _pause();
 //    void _recVideo();
+
+
+ /*------------------*/
+public slots:
+    void regler();
+/*-------------------*/
+
+
 
 protected:
     void _close();
