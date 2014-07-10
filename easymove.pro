@@ -44,4 +44,5 @@ OTHER_FILES += \
     logo.png
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    settings.ui

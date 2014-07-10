@@ -456,13 +456,13 @@ void cvWindow::_algo()
 void cvWindow:: regler(){
 
 
-    /*InterfaceReglages* fenetreReglage = new InterfaceReglages(0);
+    InterfaceReglages* fenetreReglage = new InterfaceReglages(0);
 
     QDockWidget *dockWidget = new QDockWidget(tr("Réglages"), this);
-    dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                Qt::RightDockWidgetArea);
+    dockWidget->setAllowedAreas(Qt::RightDockWidgetArea);
+
     dockWidget->setWidget(fenetreReglage);
-    addDockWidget(Qt::LeftDockWidgetArea, dockWidget);*/
+    addDockWidget(Qt::RightDockWidgetArea, dockWidget);
 
 }
 
