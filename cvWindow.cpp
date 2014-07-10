@@ -114,6 +114,7 @@ void cvWindow::paintEvent(QPaintEvent* e)
 //        }
 
         if (_height != 0) {
+            _darkenImage(video_painter);
             _drawHorizontalBar(video_painter, _matchingPatches);
         }
 
@@ -159,6 +160,7 @@ void cvWindow::_drawVideoFrame(QPainter& painter)
         {
             painter.fillRect(QRectF(QPoint(0, 0), QSize(width(), height())), Qt::black);
 
+
             QImage scaled_img = _image->scaled(QSize(width(), height()), Qt::KeepAspectRatio, Qt::FastTransformation);
 
             painter.drawImage(qRound(width()/2.0)  - qRound(scaled_img.size().width()/2.0),
@@ -180,10 +182,22 @@ void cvWindow::_drawVideoFrame(QPainter& painter)
         break;
     }
 }
+void cvWindow::_darkenImage(QPainter& painter)
+{
+    painter.setPen(QPen(QColor(0, 0, 0, 0)));
+
+    painter.setBrush(QBrush(QColor(0, 0, 0, 64)));
+    painter.drawRect(-5, -5, _video_width + 10, _height - _video_height/16 +5);
+    painter.drawRect(-5, _height + _video_height /16, _video_width + 10, _height - _video_height/16 +5);
+
+}
 
 void cvWindow::_drawHorizontalBar(QPainter& painter, matchingPatches* p)
 {
-    painter.setPen(QPen(QColor(255, 255, 255, 255)));
+
+//    painter.setPen(QPen(QColor(255, 255, 255, 255)));
+
+    painter.setPen(QPen(QColor(0, 0, 0, 0)));
     if (p == NULL) {
         painter.setBrush(QBrush(QColor(255, 255, 255, 128)));
     } else {
@@ -197,6 +211,7 @@ void cvWindow::_drawHorizontalBar(QPainter& painter, matchingPatches* p)
     }
     painter.drawRect(-5, _height - _video_height/16, _video_width + 10, _video_height/8);
 }
+
 
 void cvWindow::_drawPatch(QPainter& painter, Patch p)
 {
@@ -343,62 +358,62 @@ void cvWindow::_algo()
 
             if( _maxDistance == distance_elbow_height)
             {
-                switch(_height < averageMatchingPatches->getElbow().y())
+                if(_height - _video_height /16 > averageMatchingPatches->getElbow().y())
                 {
-                    case 0:
-                    {
-                        speakerThread->setString("lower yuur elbow");
-                        speakerThread->start();
-                        break;
-                    }
-                    case 1:
-                    {
+                    speakerThread->setString("lower yuur elbow");
+                    speakerThread->start();
+
+
+                 }
+                 else if (_height + _video_height /16 < averageMatchingPatches->getElbow().y())
+                 {
 
                         speakerThread->setString("Raise yuur elbow");
                         speakerThread->start();
-                        break;
-                    }
-                }
-            }
+
+                 }
+             }
+
             else if( _maxDistance == distance_bow_height)
             {
-                switch(_height < averageMatchingPatches->getBow().y())
+                if(_height - _video_height /16 > averageMatchingPatches->getBow().y())
                 {
-                    case 0:
-                    {
+                    speakerThread->setString("lower yuur bow");
+                    speakerThread->start();
 
-                        speakerThread->setString("lower yuur bow");
-                        speakerThread->start();
 
-                        break;
-                    }
-                    case 1:
-                    {
-
-                        speakerThread->setString("Raise yuur bow");
-                        speakerThread->start();
-                        break;
-                    }
                 }
+                else if(_height + _video_height/16 < averageMatchingPatches->getBow().y())
+                {
+
+                    speakerThread->setString("Raise yuur bow");
+                    speakerThread->start();
+
+
+                }
+
             }
             else
             {
-                switch(_height < averageMatchingPatches->getCenter().y())
-                {
-                    case 0:
-                    {
-                        speakerThread->setString("lower yuur hand");
-                        speakerThread->start();
-                        break;
-                    }
-                    case 1:
-                    {
-                        speakerThread->setString("Raise yuur hand");
-                        speakerThread->start();
-                        break;
-                    }
+                if(_height - _video_height /16 > averageMatchingPatches->getCenter().y())
+               {
+
+                    speakerThread->setString("lower yuur hand");
+                    speakerThread->start();
+
+
                 }
-            }
+
+                else if(_height + _video_height/16 < averageMatchingPatches->getCenter().y())
+                {
+
+                    speakerThread->setString("Raise yuur hand");
+                    speakerThread->start();
+
+
+                }
+                }
+
         }
     }
 }

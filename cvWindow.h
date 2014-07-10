@@ -20,6 +20,7 @@ public:
     void _drawVideoFrame(QPainter& painter);
     void _drawPatch(QPainter& painter, Patch p);
     void _drawHorizontalBar(QPainter& painter, matchingPatches* p);
+    void _darkenImage(QPainter& painter);
 
     void paintEvent(QPaintEvent* e);
     void keyPressEvent(QKeyEvent* event);
@@ -48,6 +49,8 @@ private:
     int maxDistance(int d1, int d2);
     int _height;
     speaker* speakerThread ;
+
+
     int _maxDistanceHeightInHistory();
     void _algo();
 

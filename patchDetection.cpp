@@ -1,7 +1,7 @@
 #include <patchDetection.h>
 
 patchDetection::patchDetection()
-: _redLimit(0.4), _blueLimit(0.2), _minBlobArea(1000), _maxBlobArea(10000)
+: _redLimit(0.5), _blueLimit(0.4), _minBlobArea(1000), _maxBlobArea(10000)
 {
     _capture = cvCaptureFromCAM(0);
     cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_HEIGHT, 720);
@@ -72,7 +72,7 @@ void patchDetection::detectPatches(bool displayBlobs) {
     IplImage* img = cvRetrieveFrame(_capture);
     cvFlip (img, img, 1);
 
-    cvConvertScale(img, _frame, 1, 0);
+    cvConvertScale(img, _frame, 1,0 );
 
     IplImage *segmentatedRed = cvCreateImage(_imgSize, 8, 1);
     IplImage *segmentatedBlue = cvCreateImage(_imgSize, 8, 1);
@@ -88,7 +88,7 @@ void patchDetection::detectPatches(bool displayBlobs) {
 	      double g = ((double)c.val[1])/255.;
 	      double r = ((double)c.val[2])/255.;
           unsigned char f_red = 255*((r> _redLimit +g)&&(r> _redLimit +b));
-          unsigned char f_blue = 255*((b> _blueLimit +g)&&(b> _blueLimit +r));
+          unsigned char f_blue = 255*((b> _blueLimit + r)&&(b> _blueLimit +g));
 
 	      cvSet2D(segmentatedRed, j, i, CV_RGB(f_red, f_red, f_red));
 	      cvSet2D(segmentatedBlue, j, i, CV_RGB(f_blue, f_blue, f_blue));
