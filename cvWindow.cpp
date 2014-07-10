@@ -5,8 +5,24 @@
 #include <QTimer>
 #include <QApplication>
 
-cvWindow::cvWindow()
-: _image(NULL), _ar_mode(Qt::KeepAspectRatio),
+
+/* --------------------------*/
+#include <QAction>
+#include <QScrollArea>
+#include <QToolBar>
+#include <QString>
+#include <QHBoxLayout>
+#include <QDockWidget>
+#include"interfacereglages.h"
+/* --------------------------*/
+
+
+
+
+
+
+cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
+: QMainWindow(parent, flags), _image(NULL), _ar_mode(Qt::KeepAspectRatio),
   _video_width(0), _video_height(0),
   _calibrationLimit(60), _averageFrequency(15),
   _correctionStep(true), _frameNumberForAverage(0),
@@ -23,6 +39,23 @@ cvWindow::cvWindow()
     setWindowIcon(QIcon("logo.png"));
 
     speakerThread = new speaker("welcome");
+
+
+
+    /*_________________________________________________*/
+
+    // barre d'outils
+
+        QToolBar* toolBarReglage= addToolBar("Réglages");
+        toolBarReglage->setIconSize(QSize(50,50));
+        QAction* regler = toolBarReglage->addAction("Régler paramètres");
+
+    // signaux
+        connect(regler, SIGNAL(triggered()), this, SLOT(regler()));
+
+    /*_________________________________________________*/
+
+
 
 }
 
@@ -418,4 +451,20 @@ void cvWindow::_algo()
 
 
 
+
+/*---------------------------------*/
+void cvWindow:: regler(){
+
+
+    /*InterfaceReglages* fenetreReglage = new InterfaceReglages(0);
+
+    QDockWidget *dockWidget = new QDockWidget(tr("Réglages"), this);
+    dockWidget->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                Qt::RightDockWidgetArea);
+    dockWidget->setWidget(fenetreReglage);
+    addDockWidget(Qt::LeftDockWidgetArea, dockWidget);*/
+
+}
+
+/*---------------------------------*/
 
