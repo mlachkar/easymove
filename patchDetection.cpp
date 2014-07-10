@@ -1,11 +1,11 @@
 #include <patchDetection.h>
 
 patchDetection::patchDetection()
-: _redLimit(0.35), _blueLimit(0.3), _minBlobArea(1000), _maxBlobArea(10000)
+: _redLimit(0.4), _blueLimit(0.2), _minBlobArea(1000), _maxBlobArea(10000)
 {
     _capture = cvCaptureFromCAM(0);
     cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_HEIGHT, 720);
-    cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_WIDTH, 1280);
+    cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_WIDTH, 1920);
     cvGrabFrame(_capture);
     IplImage* img = cvRetrieveFrame(_capture);
     _imgSize = cvGetSize(img);
@@ -84,7 +84,7 @@ void patchDetection::detectPatches(bool displayBlobs) {
       {
           CvScalar c = cvGet2D(_frame, j, i);
 
-	      double b = ((double)c.val[0])/255.;
+          double b = ((double)c.val[0])/255.;
 	      double g = ((double)c.val[1])/255.;
 	      double r = ((double)c.val[2])/255.;
           unsigned char f_red = 255*((r> _redLimit +g)&&(r> _redLimit +b));

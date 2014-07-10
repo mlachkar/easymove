@@ -28,8 +28,8 @@ cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
   _correctionStep(true), _frameNumberForAverage(0),
   _alignmentLimit(2000), _height(0)
 {
-    setWindowTitle(tr("EasyMove Demo"));
-    resize(350, 350);
+    setWindowTitle(tr("ezMove Demo"));
+    resize(937, 937);
     
     _timer = new QTimer();
 
@@ -39,6 +39,7 @@ cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
     setWindowIcon(QIcon("logo.png"));
 
     speakerThread = new speaker("welcome");
+<<<<<<< HEAD
 
 
 
@@ -57,6 +58,8 @@ cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
 
 
 
+=======
+>>>>>>> 0059bd97cc02aaf2d41853b9a2f58fa2ad8dfc0a
 }
 
 cvWindow::~cvWindow()
@@ -98,8 +101,8 @@ void cvWindow::paintEvent(QPaintEvent* e)
     {
         setCursor(Qt::PointingHandCursor);
         painter.fillRect(QRectF(QPoint(0, 0), QSize(width(), height())), Qt::white);
-        painter.drawImage(QRect(350/2 - 268/2, 10, 268, 268), QImage("logo.png"));
-        painter.drawText(0, 300, 350, 60, Qt::AlignHCenter, "Click to begin capture...");
+        painter.drawImage(QRect(1000/2 - 1000/2, 10, 937, 937), QImage("logo.png"));
+        painter.drawText(0, 850, 937, 60, Qt::AlignHCenter, "Click to begin capture...");
         return;
     }
 
@@ -126,30 +129,29 @@ void cvWindow::paintEvent(QPaintEvent* e)
             _patchHistory.clear();
         }
 
-        std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
+//        std::vector<Patch>::const_iterator second = p.begin(),end = p.end();
 
         //Draw lines between patches
-        std::sort(p.begin(), p.end(), Patch::compareByX);
-        if( second != end )
-        {
-           for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
-            {
-                video_painter.setPen(QPen(QColor("#ff0080")));
-                QPoint r1(0,(*first).getRadius());
-                QPoint r2(0,(*second).getRadius());
-                QPoint p1 = (QPoint)*first += r1;
-                QPoint p2 = (QPoint)*second += r2;
-                QPoint p3 = (QPoint)*first -= r1;
-                QPoint p4 = (QPoint)*second -= r2;
-                video_painter.drawLine(p1, p2);
-                video_painter.drawLine(p3, p4);
-                video_painter.drawLine(*first, *second);
-           }
-        }
+//        std::sort(p.begin(), p.end(), Patch::compareByX);
+//        if( second != end )
+//        {
+//           for(std::vector<Patch>::const_iterator first = second ++; second != end; ++first, ++second)
+//            {
+//                video_painter.setPen(QPen(QColor("#ff0080")));
+//                QPoint r1(0,(*first).getRadius());
+//                QPoint r2(0,(*second).getRadius());
+//                QPoint p1 = (QPoint)*first += r1;
+//                QPoint p2 = (QPoint)*second += r2;
+//                QPoint p3 = (QPoint)*first -= r1;
+//                QPoint p4 = (QPoint)*second -= r2;
+//                video_painter.drawLine(p1, p2);
+//                video_painter.drawLine(p3, p4);
+//                video_painter.drawLine(*first, *second);
+//           }
+//        }
 
         if (_height != 0) {
-            video_painter.setPen(QPen(Qt::black));
-            video_painter.drawLine(QPoint(0, _height), QPoint(_video_width, _height));
+            _drawHorizontalBar(video_painter, _matchingPatches);
         }
 
         _algo();
@@ -169,16 +171,16 @@ void cvWindow::paintEvent(QPaintEvent* e)
     video_painter.setPen(QPen(Qt::black));
     std::vector<Patch>::const_iterator itr;
     for(itr = p.begin(); itr != p.end(); ++itr){
-        _draw_patch(video_painter, (*itr));
+        _drawPatch(video_painter, (*itr));
     }
 
 
     // Draw a frame from the video
-    _draw_video_frame(painter);
+    _drawVideoFrame(painter);
     QWidget::paintEvent(e);
 }
 
-void cvWindow::_draw_video_frame(QPainter& painter)
+void cvWindow::_drawVideoFrame(QPainter& painter)
 {
     switch (_ar_mode)
     {
@@ -216,17 +218,45 @@ void cvWindow::_draw_video_frame(QPainter& painter)
     }
 }
 
-void cvWindow::_draw_patch(QPainter& painter, Patch p)
+void cvWindow::_drawHorizontalBar(QPainter& painter, matchingPatches* p)
 {
-    if (p.getColor() == BLUE) {
-        painter.setBrush(QBrush(QColor(128, 128, 255, 128)));
+    painter.setPen(QPen(QColor(255, 255, 255, 255)));
+    if (p == NULL) {
+        painter.setBrush(QBrush(QColor(255, 255, 255, 128)));
     } else {
-        painter.setBrush(QBrush(QColor(255, 128, 128, 128)));
+        int maxD = maxDistance(maxDistance(abs(p->getElbow().y() - _height), abs(p->getBow().y() - _height)),  abs(p->getCenter().y() - _height));
+
+        if (maxD < _video_height/8) {
+            painter.setBrush(QBrush(QColor(128, 255, 128, 128)));
+        } else {
+            painter.setBrush(QBrush(QColor(255, 255, 255, 128)));
+        }
     }
+    painter.drawRect(-5, _height - _video_height/16, _video_width + 10, _video_height/8);
+}
+
+void cvWindow::_drawPatch(QPainter& painter, Patch p)
+{
+    QColor crossColor;
     if ((_height != 0) && (abs(p.y() - _height) < 20)) {
-        painter.setBrush(QBrush(QColor(128, 255, 128, 128)));
+        crossColor = QColor(128, 255, 128, 255);
+    } else {
+        crossColor = QColor(255, 127, 0);
     }
+
+    painter.setPen(QPen(crossColor));
+    painter.setBrush(QBrush(crossColor));
     painter.drawEllipse( p, p.getRadius(), p.getRadius());
+
+    painter.setBrush(QBrush(Qt::white));
+    painter.drawEllipse( p, 4*p.getRadius()/5, 4*p.getRadius()/5);
+
+    int crossHeight = 5*p.getRadius()/6;
+    int crossWidth = p.getRadius()/10;
+
+    painter.setBrush(QBrush(crossColor));
+    painter.drawRoundedRect(p.x() - crossHeight/2, p.y() - crossWidth/2, crossHeight, crossWidth, crossWidth/2, crossWidth/2);
+    painter.drawRoundedRect(p.x() - crossWidth/2, p.y() - crossHeight/2, crossWidth, crossHeight, crossWidth/2, crossWidth/2);
 }
 
 void cvWindow::keyPressEvent(QKeyEvent* event)
@@ -261,11 +291,6 @@ void cvWindow::keyPressEvent(QKeyEvent* event)
             _height = _video_height / 2;
             break;
         }
-//        case Qt::Key_R:
-//        {
-//            _recVideo();
-//            break;
-//        }
         break;
     }
 }
@@ -292,25 +317,6 @@ void cvWindow::_pause()
     }
 }
 
-//void cvWindow::_recVideo()
-//{
-//    if (recording){
-
-//        cvGrabFrame(_patchDetection->getCapture());
-//        IplImage* img = cvRetrieveFrame(_patchDetection->getCapture());
-//        writer = cvCreateVideoWriter("/home/ezmove/MonEnregistrement.avi",-1,20,cvSize(img->width,img->height),1);
-//        cvWriteFrame(writer,img);
-//     }
-//    while(1) {
-
-//     frames = cvQueryFrame(_patchDetection->getCapture());
-//     if( !frames ) break;
-//     cvShowImage( "Enregister ..... Appuyer sur Echap pour sortir !", frames );
-//     cvWriteFrame( writer, frames );
-//    }
-//    cvReleaseVideoWriter( &writer );
-//}
-
 void cvWindow::_start()
 {
     if (_timer->isActive()) {
@@ -336,7 +342,6 @@ void cvWindow::_close()
     emit closed();
 }
 
-
 int cvWindow::_maxDistanceHeightInHistory()
 {
     int maxDistance = 0;
@@ -351,21 +356,19 @@ int cvWindow::_maxDistanceHeightInHistory()
     }
     return height;
 }
-int cvWindow::max_distance(int d1, int d2)
+int cvWindow::maxDistance(int d1, int d2)
 {
-    if(d1 >= d2)
+    if(d1 > d2)
         return d1;
-    else return d2;
-
+    else
+        return d2;
 }
 
 void cvWindow::_algo()
 {
-
-
-    if (_frameNumberForAverage == _averageFrequency -1 )
+    if (_frameNumberForAverage == _averageFrequency - 1 )
     {
-        if (_patchHistory.size() == 14)
+        if (_patchHistory.size() == _averageFrequency - 1 )
         {
             matchingPatches* averageMatchingPatches = matchingPatches::getAverage(_patchHistory);
 
@@ -373,80 +376,70 @@ void cvWindow::_algo()
             int distance_bow_height = abs( averageMatchingPatches->getBow().y() - _height);
             int distance_center_height = abs( averageMatchingPatches->getCenter().y() - _height);
 
-            int _max_distance = max_distance(max_distance(distance_elbow_height,distance_bow_height),distance_center_height);
+            int _maxDistance = maxDistance(maxDistance(distance_elbow_height,distance_bow_height),distance_center_height);
 
-            if( _max_distance == distance_elbow_height)
+            if( _maxDistance == distance_elbow_height)
             {
-
                 switch(_height < averageMatchingPatches->getElbow().y())
                 {
-                case 0:
-                {
-//                    speaker* speakerThread = new speaker("lower yuur elbow");
-                   speakerThread->setString("lower yuur elbow");
-                   speakerThread->start();
-                    //speakerThread->start();
-                    break;
-                }
-                case 1:
-                {
-                    //speaker* speakerThread = new speaker("raise yuur elbow");
+                    case 0:
+                    {
+                        speakerThread->setString("lower yuur elbow");
+                        speakerThread->start();
+                        break;
+                    }
+                    case 1:
+                    {
 
-                    speakerThread->setString("Rqise yuur elbow");
-                    speakerThread->start();
-//                    speakerThread->start();
-                    break;
-                }
+                        speakerThread->setString("Raise yuur elbow");
+                        speakerThread->start();
+                        break;
+                    }
                 }
             }
-            else if( _max_distance == distance_bow_height)
+            else if( _maxDistance == distance_bow_height)
             {
                 switch(_height < averageMatchingPatches->getBow().y())
                 {
-                case 0:
-                {
-                    //speaker* speakerThread = new speaker("lower yuur bow");
-                    speakerThread->setString("lower yuur elbow");
-                    speakerThread->start();
-//                    speakerThread->start();
-                    break;
-                }
-                case 1:
-                {
-                    //speaker* speakerThread = new speaker("raise yuur bow");
-                    speakerThread->setString("Rqise yuur elbow");
-                    speakerThread->start();
-//                    speakerThread->start();
-                    break;
-                }
+                    case 0:
+                    {
+
+                        speakerThread->setString("lower yuur bow");
+                        speakerThread->start();
+
+                        break;
+                    }
+                    case 1:
+                    {
+
+                        speakerThread->setString("Raise yuur bow");
+                        speakerThread->start();
+                        break;
+                    }
                 }
             }
             else
-
             {
                 switch(_height < averageMatchingPatches->getCenter().y())
                 {
-                case 0:
-                {
-                    speakerThread->setString("lower yuur elbow");
-                    speakerThread->start();
-                    //speaker* speakerThread = new speaker("lower yuur hand");
-//                    speakerThread->start();
-                    break;
-                }
-                case 1:
-                {
-                    //speaker* speakerThread = new speaker("raise yuur hand");
-                    speakerThread->setString("Rqise yuur elbow");
-                    speakerThread->start();
-//                    speakerThread->start();
-                    break;
-                }
+                    case 0:
+                    {
+                        speakerThread->setString("lower yuur hand");
+                        speakerThread->start();
+                        break;
+                    }
+                    case 1:
+                    {
+                        speakerThread->setString("Raise yuur hand");
+                        speakerThread->start();
+                        break;
+                    }
                 }
             }
+        }
     }
-  }
 }
+<<<<<<< HEAD
 
 
 
@@ -468,3 +461,5 @@ void cvWindow:: regler(){
 
 /*---------------------------------*/
 
+=======
+>>>>>>> 0059bd97cc02aaf2d41853b9a2f58fa2ad8dfc0a

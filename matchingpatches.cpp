@@ -97,6 +97,7 @@ Patch matchingPatches::getElbow() {
 Patch matchingPatches::getBow() {
     return bow;
 }
+
 Patch matchingPatches::getCenter() {
     return center;
 }
