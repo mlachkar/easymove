@@ -1,7 +1,7 @@
 #include <patchDetection.h>
 
 patchDetection::patchDetection()
-: _redLimit(0.5), _blueLimit(0.4), _minBlobArea(1000), _maxBlobArea(10000)
+: _redLimit(0.3), _blueLimit(0.1), _minBlobArea(500), _maxBlobArea(15000)
 {
     _capture = cvCaptureFromCAM(0);
     cvSetCaptureProperty(_capture, CV_CAP_PROP_FRAME_HEIGHT, 720);

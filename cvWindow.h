@@ -55,6 +55,7 @@ private:
 
     int maxDistance(int d1, int d2);
     int _height;
+    int _limiteRec;
     speaker* speakerThread ;
 
 

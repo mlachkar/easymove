@@ -17,16 +17,12 @@
 /* --------------------------*/
 
 
-
-
-
-
 cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
 : QMainWindow(parent, flags), _image(NULL), _ar_mode(Qt::KeepAspectRatio),
   _video_width(0), _video_height(0),
-  _calibrationLimit(60), _averageFrequency(15),
+  _calibrationLimit(20), _averageFrequency(15),
   _correctionStep(true), _frameNumberForAverage(0),
-  _alignmentLimit(2000), _height(0)
+  _alignmentLimit(2000), _height(0),_limiteRec(32)
 {
     setWindowTitle(tr("ezMove Demo"));
     resize(937, 937);
@@ -39,7 +35,6 @@ cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
     setWindowIcon(QIcon("logo.png"));
 
     speakerThread = new speaker("welcome");
-<<<<<<< HEAD
 
 
 
@@ -57,9 +52,6 @@ cvWindow::cvWindow(QWidget* parent, Qt::WindowFlags flags)
     /*_________________________________________________*/
 
 
-
-=======
->>>>>>> 0059bd97cc02aaf2d41853b9a2f58fa2ad8dfc0a
 }
 
 cvWindow::~cvWindow()
@@ -224,8 +216,8 @@ void cvWindow::_darkenImage(QPainter& painter)
     painter.setPen(QPen(QColor(0, 0, 0, 0)));
 
     painter.setBrush(QBrush(QColor(0, 0, 0, 64)));
-    painter.drawRect(-5, -5, _video_width + 10, _height - _video_height/16 +5);
-    painter.drawRect(-5, _height + _video_height /16, _video_width + 10, _height - _video_height/16 +5);
+    painter.drawRect(-5, -5, _video_width + 10, _height - _video_height/_limiteRec +5);
+    painter.drawRect(-5, _height + _video_height /_limiteRec, _video_width + 10,  _video_height - _height - _video_height/_limiteRec );
 
 }
 
@@ -240,13 +232,13 @@ void cvWindow::_drawHorizontalBar(QPainter& painter, matchingPatches* p)
     } else {
         int maxD = maxDistance(maxDistance(abs(p->getElbow().y() - _height), abs(p->getBow().y() - _height)),  abs(p->getCenter().y() - _height));
 
-        if (maxD < _video_height/8) {
+        if (maxD < 2*_video_height/_limiteRec) {
             painter.setBrush(QBrush(QColor(128, 255, 128, 128)));
         } else {
             painter.setBrush(QBrush(QColor(255, 255, 255, 128)));
         }
     }
-    painter.drawRect(-5, _height - _video_height/16, _video_width + 10, _video_height/8);
+    painter.drawRect(-5, _height - _video_height/_limiteRec, _video_width + 10, 2*_video_height/_limiteRec);
 }
 
 
@@ -395,14 +387,14 @@ void cvWindow::_algo()
 
             if( _maxDistance == distance_elbow_height)
             {
-                if(_height - _video_height /16 > averageMatchingPatches->getElbow().y())
+                if(_height - _video_height /_limiteRec > averageMatchingPatches->getElbow().y())
                 {
                     speakerThread->setString("lower yuur elbow");
                     speakerThread->start();
 
 
                  }
-                 else if (_height + _video_height /16 < averageMatchingPatches->getElbow().y())
+                 else if (_height + _video_height /_limiteRec < averageMatchingPatches->getElbow().y())
                  {
 
                         speakerThread->setString("Raise yuur elbow");
@@ -413,14 +405,14 @@ void cvWindow::_algo()
 
             else if( _maxDistance == distance_bow_height)
             {
-                if(_height - _video_height /16 > averageMatchingPatches->getBow().y())
+                if(_height - _video_height /_limiteRec > averageMatchingPatches->getBow().y())
                 {
                     speakerThread->setString("lower yuur bow");
                     speakerThread->start();
 
 
                 }
-                else if(_height + _video_height/16 < averageMatchingPatches->getBow().y())
+                else if(_height + _video_height/_limiteRec < averageMatchingPatches->getBow().y())
                 {
 
                     speakerThread->setString("Raise yuur bow");
@@ -432,7 +424,7 @@ void cvWindow::_algo()
             }
             else
             {
-                if(_height - _video_height /16 > averageMatchingPatches->getCenter().y())
+                if(_height - _video_height /_limiteRec > averageMatchingPatches->getCenter().y())
                {
 
                     speakerThread->setString("lower yuur hand");
@@ -441,7 +433,7 @@ void cvWindow::_algo()
 
                 }
 
-                else if(_height + _video_height/16 < averageMatchingPatches->getCenter().y())
+                else if(_height + _video_height/_limiteRec < averageMatchingPatches->getCenter().y())
                 {
 
                     speakerThread->setString("Raise yuur hand");
@@ -454,8 +446,6 @@ void cvWindow::_algo()
         }
     }
 }
-<<<<<<< HEAD
-
 
 
 
@@ -476,5 +466,3 @@ void cvWindow:: regler(){
 
 /*---------------------------------*/
 
-=======
->>>>>>> 0059bd97cc02aaf2d41853b9a2f58fa2ad8dfc0a
